@@ -1,0 +1,44 @@
+---
+server:
+  shutdown: graceful
+
+spring:
+  application:
+    name: k-coroutines
+  main:
+    allow-bean-definition-overriding: true
+  jackson:
+    default-property-inclusion: non_null
+  data:
+    mongodb:
+      auto-index-creation: true
+  cloud:
+    function:
+      definition: updateStarterConsumer;updateLegendaryConsumer
+    stream:
+      bindings:
+        updateStarterProducer-out-0:
+          binder: rabbit
+          destination: updateStarter-queue
+        updateStarterConsumer-in-0:
+          binder: rabbit
+          group: updateStarter-queue
+          destination: updateStarter-queue
+        updateLegendaryProducer-out-0:
+          binder: kafka
+          destination: updateLegendary-topic
+        updateLegendaryConsumer-in-0:
+          binder: kafka
+          group: ${spring.application.name}-updateLegendary-topic
+          destination: updateLegendary-topic
+      rabbit:
+        bindings:
+          updateStarterConsumer-in-0:
+            consumer:
+              queue-name-group-only: true
+
+integration:
+  client:
+    pokemon-api:
+      name: pokemon-api
+      url: http://localhost:${wiremock.server.port}/api

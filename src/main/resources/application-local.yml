@@ -1,0 +1,54 @@
+---
+server:
+  shutdown: graceful
+  port: 8080
+
+spring:
+  application:
+    name: k-coroutines
+  main:
+    allow-bean-definition-overriding: true
+  jackson:
+    default-property-inclusion: non_null
+  data:
+    mongodb:
+      auto-index-creation: true
+      uri: mongodb://admin:password@localhost:27017/db_kcoroutines?authSource=admin
+  rabbitmq:
+    addresses: localhost:5672
+    username: user
+    password: pass
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      auto-offset-reset: earliest
+  cloud:
+    function:
+      definition: updateStarterConsumer;updateLegendaryConsumer
+    stream:
+      bindings:
+        updateStarterProducer-out-0:
+          binder: rabbit
+          destination: updateStarter-queue
+        updateStarterConsumer-in-0:
+          binder: rabbit
+          group: updateStarter-queue
+          destination: updateStarter-queue
+        updateLegendaryProducer-out-0:
+          binder: kafka
+          destination: updateLegendary-topic
+        updateLegendaryConsumer-in-0:
+          binder: kafka
+          group: ${spring.application.name}-updateLegendary-topic
+          destination: updateLegendary-topic
+      rabbit:
+        bindings:
+          updateStarterConsumer-in-0:
+            consumer:
+              queue-name-group-only: true
+
+integration:
+  client:
+    pokemon-api:
+      name: pokemon-api
+      url: http://localhost:9080/api
