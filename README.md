@@ -4,8 +4,9 @@ Due to its simplicity, concurrency issues may occur.
 # Techs
 - Kotlin Coroutines
 - Spring
-- Spring Data MongoDB
+- Spring Data MongoDB (Reactive)
 - Spring Cloud Stream Binder (RabbitMQ, Kafka)
+- Feign
 - Wiremock
 - Testcontainers (MongoDB, RabbitMQ, Kafka)
 
